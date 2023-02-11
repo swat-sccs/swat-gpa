@@ -1,3 +1,38 @@
+
+// Default variable overrides
+$body-bg: #31425F;
+$body-color: #ffffff;
+$primary: #31425F;
+$secondary: #ffffff;
+$success: #28A745;
+$info: #F46523;
+$warning: #FFC107;
+$danger: #DC3545;
+$light: #F8F9FA;
+$dark: #343A40;
+$font-family-sans-serif: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-monospace: "Roboto Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+$link-color: $info;
+
+$theme-colors: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors: map-merge(
+  (
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
+  ),
+  $theme-colors
+);
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
 .App {
   text-align: center;
 }
@@ -14,7 +49,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #74777c;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,10 +59,6 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +66,14 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Table {
+  // Add some padding to the table
+  padding: 20rem;
+  font-size: small;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
 }

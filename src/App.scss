@@ -1,7 +1,7 @@
 
 // Default variable overrides
-$body-bg: #31425F;
-$body-color: #ffffff;
+$body-bg: #f2f2f2;
+$body-color: #31425f;
 $primary: #31425F;
 $secondary: #ffffff;
 $success: #28A745;
@@ -10,9 +10,7 @@ $warning: #FFC107;
 $danger: #DC3545;
 $light: #F8F9FA;
 $dark: #343A40;
-$font-family-sans-serif: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-family-monospace: "Roboto Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
+$font-family-sans-serif: 'Raleway', sans-serif;
 $link-color: $info;
 
 $theme-colors: () !default;
@@ -33,6 +31,8 @@ $theme-colors: map-merge(
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;800&display=swap');
+
 .App {
   text-align: center;
 }
@@ -42,38 +42,58 @@ $theme-colors: map-merge(
   pointer-events: none;
 }
 
+strong {
+    font-weight: 800;
+    color:#F46523;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+.nav-link {
+    color:#ffffff;
+}
+
+#form-barrier {
+    padding: 0px 2rem 0px 2rem;
+    margin-bottom: 10px;
+}
+
+.instructionsText {
+    font-weight: 800;
+    font-size: large;
+    margin: 0px;
+}
+
+.btns {
+    width: calc(25% - 20px);
+    height: 80%;
+    padding: 10px; /* Some padding */
+    margin: 5px;
+    box-shadow: -1px 3px 4px 0px rgba(0,0,0,0.2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer; /* Pointer/hand icon */
+    float: center; /* Float the buttons side by side */
+    transition: 300ms;
+}
+
 .App-header {
   background-color: #74777c;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .Table {
   // Add some padding to the table
-  padding: 20rem;
   font-size: small;
   margin: 0 auto;
   width: 100%;
   max-width: 100%;
-  margin-bottom: 1rem;
 }

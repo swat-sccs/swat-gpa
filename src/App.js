@@ -27,52 +27,51 @@ function App() {
   return (
     <div className="App">
       <Navbar bg="primary" variant="dark" >
-        <Navbar.Brand href="#home">
-          SCCS
+        <Container>
+        <Navbar.Brand href="https://sccs.swarthmore.edu">
+        <img
+              src={ logo }
+              width="65"
+              height="65"
+              className="d-inline-block align-top"
+              alt="SCCS Logo"
+            />
         </Navbar.Brand>
-        <Nav activeKey="/">
-          <Nav.Item>
-            <Nav.Link href="https://sccs.swarthmore.edu">Home</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="https://sccs.swarthmore.edu/docs">Docs</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/">GPA Calculator</Nav.Link>
-          </Nav.Item>
+        <Nav>
+            <Nav.Item>
+                <Nav.Link href="/"><h4>Swarthmore College <br/> <strong>GPA Calculator</strong></h4></Nav.Link>
+            </Nav.Item>
         </Nav>
+        <Nav activeKey="/">
+            <Nav.Item>
+                <Nav.Link href="https://sccs.swarthmore.edu/docs"><h4>Docs</h4></Nav.Link>
+            </Nav.Item>
+        </Nav>
+        </Container>
       </Navbar>
 
-
       <Container className="p-3">
-        <h1 className="header">Swarthmore College GPA Calculator</h1>
-        <p>
+        <p className="instructionsText">
           Instructions: Go to <a href="https://myswat.swarthmore.edu/" target="_blank">mySwat</a>, copy the entirety of the "Grades at a Glance" page (CTRL + A), then paste it into the text box below. Finally, click "Calculate GPA" to see your GPA.
         </p>
 
       </Container>
       <h1 id="gpa"></h1>
-      <header className="App-header">
-        <Form>
+      <div id="form-barrier">
+      <Form>
           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Important Text Box</Form.Label>
-            <Form.Control id="eval-text" as="textarea" rows={3} />
+                <Form.Control id="eval-text" as="textarea" rows={3} />
           </Form.Group>
         </Form>
         <Row>
           <Col>
-            <Button id="calcbtn" variant="primary" size="lg" as="input" type="submit" value="Calculate Grades" onClick={calculate} />
-          </Col>
-          <Col>
-            <Button variant="primary" size="lg" as="input" type="submit" value="Clear Text Box" onClick={clearBox} />
-          </Col>
-          <Col>
-            <Button variant="primary" size="lg" as="input" type="submit" value="Fill with Sample" onClick={fillSample} />
-          </Col>
-          <Col>
-            <Button variant="primary" size="lg" as="input" type="submit" value="ddd" onClick={calculategpa} />
+            <Button className="btns" id="calcbtn" variant="primary" size="lg" as="input" type="submit" value="Calculate Grades" onClick={calculate} />
+            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Clear Text Box" onClick={clearBox} />
+            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Fill with Sample" onClick={fillSample} />
+            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="ddd" onClick={calculategpa} />
           </Col>
         </Row>
+        </div>
 
 
         <Table striped borderless hover className="Table">
@@ -92,14 +91,6 @@ function App() {
 
           </tbody>
         </Table>
-
-        <ExampleToast>
-          We now have Toasts
-          <span role="img" aria-label="tada">
-            🎉
-          </span>
-        </ExampleToast>
-      </header>
     </div>
   );
 

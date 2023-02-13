@@ -1,52 +1,65 @@
 import logo from './logo.svg';
 import './App.scss';
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client'
 
-import Toast from 'react-bootstrap/Toast';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Table, Row, Col, Nav, Navbar } from 'react-bootstrap';
 
+import FormattingErrorToast from './Components/FormattingErrorToast';
 
-const ExampleToast = ({ children }) => {
-  const [show, toggleShow] = useState(true);
-
-  return (
-    <Toast show={show} onClose={() => toggleShow(!show)}>
-      <Toast.Header>
-        <strong className="mr-auto">React-Bootstrap</strong>
-      </Toast.Header>
-      <Toast.Body>{children}</Toast.Body>
-    </Toast>
-  );
+const ROUND_TO = 2;
+// Official grade point equivalencies from the Swarthmore College registrar
+const GRADE_POINT_EQUIVS = {
+  'A+': 4.0,
+  'A': 4.0,
+  'A-': 3.67,
+  'B+': 3.33,
+  'B': 3.0,
+  'B-': 2.67,
+  'C+': 2.33,
+  'C': 2.0,
+  'C-': 1.67,
+  'D+': 1.33,
+  'D': 1.0,
+  'D-': 0.67,
+  'F': 0.0
 };
-
+const COURSE_FIELDS = ['course',
+  'title',
+  'credits_attemped',
+  'credits_earned',
+  'grade',
+  'division',
+  'instructor',
+  'affects_gpa'];
 
 function App() {
   return (
     <div className="App">
       <Navbar bg="primary" variant="dark" >
         <Container>
-        <Navbar.Brand href="https://sccs.swarthmore.edu">
-        <img
-              src={ logo }
+          <Navbar.Brand href="https://sccs.swarthmore.edu">
+            <img
+              src={logo}
               width="65"
               height="65"
               className="d-inline-block align-top"
               alt="SCCS Logo"
             />
-        </Navbar.Brand>
-        <Nav>
+          </Navbar.Brand>
+          <Nav>
             <Nav.Item>
-                <Nav.Link href="/"><h4>Swarthmore College <br/> <strong>GPA Calculator</strong></h4></Nav.Link>
+              <Nav.Link href="/"><h4>Swarthmore College <br /> <strong>GPA Calculator</strong></h4></Nav.Link>
             </Nav.Item>
-        </Nav>
-        <Nav activeKey="/">
+          </Nav>
+          <Nav activeKey="/">
             <Nav.Item>
-                <Nav.Link href="https://sccs.swarthmore.edu/docs"><h4>Docs</h4></Nav.Link>
+              <Nav.Link href="https://sccs.swarthmore.edu/docs"><h4>Docs</h4></Nav.Link>
             </Nav.Item>
-        </Nav>
+          </Nav>
         </Container>
       </Navbar>
 
@@ -56,64 +69,162 @@ function App() {
         </p>
 
       </Container>
-      <h1 id="gpa"></h1>
+      <Container>
+        <h1 id="gpa"></h1>
+        <p id="selected-count"></p>
+      </Container>
       <div id="form-barrier">
-      <Form>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                <Form.Control id="eval-text" as="textarea" rows={3} />
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Control id="eval-text" as="textarea" rows={18} onPaste={populate_table} />
           </Form.Group>
         </Form>
         <Row>
           <Col>
-            <Button className="btns" id="calcbtn" variant="primary" size="lg" as="input" type="submit" value="Calculate Grades" onClick={calculate} />
-            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Clear Text Box" onClick={clearBox} />
-            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Fill with Sample" onClick={fillSample} />
-            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="ddd" onClick={calculategpa} />
+            <Button className="btns" id="calcbtn" variant="primary" size="lg" as="input" type="submit" value="Calculate GPA" onClick={populate_table} />
+            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Clear" onClick={clear} />
+            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Fill with Example" onClick={fillSample} />
           </Col>
         </Row>
-        </div>
+      </div>
 
 
-        <Table striped borderless hover className="Table">
-          <thead>
-            <tr>
-              <th scope="col">Course</th>
-              <th scope="col">Title</th>
-              <th scope="col">Credits Attempted</th>
-              <th scope="col">Credits Earned</th>
-              <th scope="col">Grade</th>
-              <th scope="col">Division</th>
-              <th scope="col">Instructor</th>
-              <th scope="col">Affects GPA</th>
-            </tr>
-          </thead>
-          <tbody id="grades-table">
+      <Table striped borderless hover className="Table" onClick={calculategpa}>
+        <thead>
+          <tr>
+            <th scope="col">Course</th>
+            <th scope="col">Title</th>
+            <th scope="col">Credits Attempted</th>
+            <th scope="col">Credits Earned</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Division</th>
+            <th scope="col">Instructor</th>
+            <th scope="col">Affects GPA</th>
+          </tr>
+        </thead>
+        <tbody id="grades-table">
 
-          </tbody>
-        </Table>
+        </tbody>
+      </Table>
+
+      <div id="formatting-error"></div>
+
     </div>
   );
-
-  function SubmitButton() {
-    function calculate() {
-      var raw_str = document.getElementById("eval-text").value;
-
-      var course_list = parse_grade(raw_str);
-      generate_table(course_list);
-    };
-
-    return (
-      <div className="d-grid gap-2">
-
-        <Button variant="primary" size="lg" as="input" type="submit" value="Calculate!" onClick={calculate} />
-      </div>
-    );
-  }
-
 }
 
-function clearBox() {
+function clear() {
   document.getElementById("eval-text").value = "";
+  document.getElementById("eval-text").rows = 18;
+  document.getElementById("grades-table").innerHTML = "";
+  document.getElementById("gpa").innerHTML = "";
+  document.getElementById("selected-count").innerHTML = "";
+}
+
+function grade_point_equiv(grade, division) {
+  if (grade in GRADE_POINT_EQUIVS) {
+    return GRADE_POINT_EQUIVS[grade];
+  } else if (division.includes('PE')) {
+    // PE classes don't affect GPA
+    return 0.0;
+  } else {
+    // Grade is already formatted as a grade point float (for Bryn Mawr and Haverford classes)
+    // Or it's has no grade (for C/NC classes)
+    var grade_point = parseFloat(grade);
+    return isNaN(grade_point) ? 0.0 : grade_point;
+  }
+}
+
+function parse_grade() {
+  var raw_str = document.getElementById("eval-text").value;
+  var lines = raw_str.split('\n');
+
+  // Remove term header lines
+  var courses = lines.filter(function (line) {
+    return line.trim().match(/[A-Z]{4}\s\d{3}/);
+  });
+
+  var course_list = [];
+
+  courses.forEach(function (course) {
+    var course_info = course.split('\t');
+    course_info.shift();
+    course_info.push(true); // Add 'affects_gpa' field
+
+    if (course_info.length == COURSE_FIELDS.length) {
+      var dict = Object.fromEntries(course_info.map(function (field, i) {
+        
+        return [COURSE_FIELDS[i], course_info[i]];
+      }));
+
+      if (grade_point_equiv(dict['grade'], dict['division']) == 0.0) {
+        dict['affects_gpa'] = false;
+      }
+      course_list.push(dict);
+    }
+  });
+
+  return course_list;
+}
+
+function populate_table() {
+  let course_list = parse_grade();
+  let populated = false;
+
+  course_list.forEach(function (course) {
+    if (document.getElementById(course['course']) == null) { // Don't add duplicate courses
+      var row = document.createElement("tr");
+      COURSE_FIELDS.forEach(function (field) {
+        var cell = document.createElement("td");
+
+        if (field == "affects_gpa") {
+          if (course[field]) {
+            cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
+          }
+        } else {
+          cell.innerHTML = course[field];
+        }
+        row.appendChild(cell);
+      });
+      document.getElementById("grades-table").appendChild(row);
+      populated = true;
+    }
+  });
+
+  if (populated) {
+    document.getElementById("eval-text").rows = 3;
+    calculategpa();
+  } else {
+    const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
+    root.render(<FormattingErrorToast />);
+  }
+}
+
+
+function calculategpa() {
+  let total_grade_points = 0;
+  let total_credits = 0;
+  let courses = 0;
+  let gpa = null;
+
+  for (let i = 0; i < document.getElementById('grades-table').rows.length; i++) {
+    let row = document.getElementById('grades-table').rows[i];
+
+    let checkbox = row.cells[COURSE_FIELDS.indexOf('affects_gpa')].children[0]; // Affected GPA checkbox
+    if (checkbox && checkbox.checked) {
+      let credits = parseInt(row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerHTML);
+      let grade_points = grade_point_equiv(row.cells[COURSE_FIELDS.indexOf('grade')].innerHTML, row.cells[COURSE_FIELDS.indexOf('division')].innerHTML);
+      total_grade_points += grade_points * credits;
+      total_credits += credits;
+      courses++;
+    }
+
+    gpa = (total_grade_points / total_credits).toFixed(ROUND_TO);
+    document.getElementById('selected-count').innerText = " (" + courses + " courses selected)";
+  }
+  document.getElementById('gpa').innerHTML = "GPA: " + gpa;
+
+  return true;
 }
 
 function fillSample() {
@@ -141,147 +252,8 @@ function fillSample() {
     "Credits Earned	 	 	 	4	 	 	 \n" +
     "Total Credits Earned	 	 	 	12	 	 	 \n" +
     "release 1.0 Set Screen Reader Mode On\n";
+
+  populate_table();
 }
 
-function calculate() {
-  var raw_str = document.getElementById("eval-text").value;
-
-  var course_list = parse_grade(raw_str);
-  generate_table(course_list);
-
-  calculategpa();
-  
-
-  document.getElementById("calcbtn").value = "Reevaluate";
-};
-
-const ROUND_TO = 2;
-// Official grade point equivalencies from the Swarthmore College registrar
-const GRADE_POINT_EQUIVS = {
-  'A+': 4.0,
-  'A': 4.0,
-  'A-': 3.67,
-  'B+': 3.33,
-  'B': 3.0,
-  'B-': 2.67,
-  'C+': 2.33,
-  'C': 2.0,
-  'C-': 1.67,
-  'D+': 1.33,
-  'D': 1.0,
-  'D-': 0.67,
-  'F': 0.0
-};
-
-const COURSE_FIELDS = ['course',
-  'title',
-  'credits_attemped',
-  'credits_earned',
-  'grade',
-  'division',
-  'instructor',
-  'affects_gpa'];
-
-function grade_point_equiv(grade) {
-  if (grade in GRADE_POINT_EQUIVS) {
-    return GRADE_POINT_EQUIVS[grade];
-  } else {
-    // Grade is already formatted as a grade point float (for Bryn Mawr and Haverford classes)
-    // Or it's has no grade (for C/NC classes)
-    var grade_point = parseFloat(grade);
-    return isNaN(grade_point) ? 0.0 : grade_point;
-  }
-}
-
-function parse_grade(raw_str) {
-  var lines = raw_str.split('\n');
-
-  // Remove term header lines
-  var courses = lines.filter(function (line) {
-    return line.trim().match(/[A-Z]{4}\s\d{3}/);
-  });
-
-  var course_list = [];
-
-  courses.forEach(function (course) {
-    var course_info = course.split('\t');
-    course_info.shift();
-    course_info.push(true);
-
-    if (course_info.length == COURSE_FIELDS.length) {
-      var dict = Object.fromEntries(course_info.map(function (field, i) {
-        return [COURSE_FIELDS[i], course_info[i]];
-      }));
-
-      if (grade_point_equiv(dict['grade']) == 0.0) {
-        dict['affects_gpa'] = false;
-      }
-      course_list.push(dict);
-    }
-  });
-
-  return course_list;
-}
-
-function generate_table(course_list) {
-  course_list.forEach(function (course) {
-    if (document.getElementById(course['course']) == null) { // Don't add duplicate courses
-      var row = document.createElement("tr");
-      COURSE_FIELDS.forEach(function (field) {
-        var cell = document.createElement("td");
-
-        if (field == "affects_gpa" && course[field]) {
-          cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
-        } else {
-          cell.innerHTML = course[field];
-        }
-        row.appendChild(cell);
-      });
-      document.getElementById("grades-table").appendChild(row);
-    }
-  });
-}
-
-
-function calculategpa() {
-  let courses = [];
-
-  document.getElementById('grades-table').querySelectorAll('tr').forEach((row, i) => {
-    if (i === 0) { return true; } 
-
-    let course_data = {};
-    let include = false;
-
-    Array.from(row.children).forEach((cell, j) => {
-      if (cell.getAttribute('class') === 'affects_gpa') {
-        let checkbox = cell.children[0];
-        if (checkbox && checkbox.checked) {
-          include = true;
-        }
-      } else if (['grade', 'credits_earned'].includes(cell.getAttribute('class'))) {
-        course_data[cell.getAttribute('class')] = cell.innerHTML;
-      }
-
-      if (include) {
-        courses.push(course_data);
-      }
-    });
-
-    let total_grade_points = 0;
-    let total_credits = 0;
-
-    courses.forEach(course => {
-      total_grade_points += grade_point_equiv(course.grade) * course.credits_earned;
-      total_credits += course.credits_earned;
-    });
-
-    let gpa = total_grade_points / total_credits;
-    gpa = gpa.toFixed(ROUND_TO);
-
-    document.querySelector('#gpa').innerHTML = gpa;
-    // document.querySelector('#selected_count').innerHTML = " (" + courses.length + " courses selected)";
-  });
-
-  return true;
-}
 export default App;

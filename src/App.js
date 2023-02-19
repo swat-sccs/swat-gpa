@@ -1,12 +1,9 @@
 import logo from './logo.svg';
 import './App.scss';
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client'
 
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import { Table, Row, Col, Nav, Navbar } from 'react-bootstrap';
+import { Button, Form, Container, Table, Row, Col, Nav, Navbar } from 'react-bootstrap';
 
 import FormattingErrorToast from './Components/FormattingErrorToast';
 
@@ -63,31 +60,29 @@ function App() {
         </Container>
       </Navbar>
 
+      <div id="form-barrier" className="p-3">
+        <div id="formatting-error"></div>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Control id="eval-text" as="textarea" rows={18}
+              placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
+          </Form.Group>
+        </Form>
+        <CustomButton value="Calculate" onClick={populate_table} />
+        <CustomButton value="Example" onClick={fill_sample} />
+        <CustomButton value="Clear" onClick={clear} />
+      </div>
+
       <Container className="p-3">
         <p className="instructionsText">
-          Instructions: Go to <a href="https://myswat.swarthmore.edu/" target="_blank">mySwat</a>, copy the entirety of the "Grades at a Glance" page (CTRL + A), then paste it into the text box below. Finally, click "Calculate GPA" to see your GPA.
+          Instructions: Go to <a href="https://myswat.swarthmore.edu/" target="_blank" rel="noreferrer">mySwat</a>, copy the entirety of the "Grades at a Glance" page (CTRL + A), then paste it into the text box above. Finally, click "Calculate GPA" to see your GPA.
         </p>
-
       </Container>
-      <Container>
+
+      <Container className="p-3">
         <h1 id="gpa"></h1>
         <p id="selected-count"></p>
       </Container>
-      <div id="form-barrier">
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Control id="eval-text" as="textarea" rows={18} onPaste={populate_table} />
-          </Form.Group>
-        </Form>
-        <Row>
-          <Col>
-            <Button className="btns" id="calcbtn" variant="primary" size="lg" as="input" type="submit" value="Calculate GPA" onClick={populate_table} />
-            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Clear" onClick={clear} />
-            <Button className="btns" variant="primary" size="lg" as="input" type="submit" value="Fill with Example" onClick={fillSample} />
-          </Col>
-        </Row>
-      </div>
-
 
       <Table striped borderless hover className="Table" onClick={calculategpa}>
         <thead>
@@ -106,19 +101,30 @@ function App() {
 
         </tbody>
       </Table>
-
-      <div id="formatting-error"></div>
-
     </div>
   );
 }
 
-function clear() {
+function CustomButton(props) {
+  return (
+    <Button className="Button" size="lg" variant="primary" as="input" type="submit" onClick={props.onClick} value={props.value} />
+  );
+}
+
+function clearText() {
   document.getElementById("eval-text").value = "";
   document.getElementById("eval-text").rows = 18;
+}
+
+function clearInfo() {
   document.getElementById("grades-table").innerHTML = "";
   document.getElementById("gpa").innerHTML = "";
   document.getElementById("selected-count").innerHTML = "";
+}
+
+function clear() {
+  clearText();
+  clearInfo();
 }
 
 function grade_point_equiv(grade, division) {
@@ -135,7 +141,7 @@ function grade_point_equiv(grade, division) {
   }
 }
 
-function parse_grade() {
+function parse_input() {
   var raw_str = document.getElementById("eval-text").value;
   var lines = raw_str.split('\n');
 
@@ -151,13 +157,13 @@ function parse_grade() {
     course_info.shift();
     course_info.push(true); // Add 'affects_gpa' field
 
-    if (course_info.length == COURSE_FIELDS.length) {
+    if (course_info.length === COURSE_FIELDS.length) {
       var dict = Object.fromEntries(course_info.map(function (field, i) {
-        
+
         return [COURSE_FIELDS[i], course_info[i]];
       }));
 
-      if (grade_point_equiv(dict['grade'], dict['division']) == 0.0) {
+      if (grade_point_equiv(dict['grade'], dict['division']) === 0.0) {
         dict['affects_gpa'] = false;
       }
       course_list.push(dict);
@@ -168,32 +174,35 @@ function parse_grade() {
 }
 
 function populate_table() {
-  let course_list = parse_grade();
+  let course_list = parse_input();
   let populated = false;
 
+  clearInfo(); // Let me be clear
   course_list.forEach(function (course) {
-    if (document.getElementById(course['course']) == null) { // Don't add duplicate courses
-      var row = document.createElement("tr");
-      COURSE_FIELDS.forEach(function (field) {
-        var cell = document.createElement("td");
+    var row = document.createElement("tr");
+    COURSE_FIELDS.forEach(function (field) {
+      var cell = document.createElement("td");
 
-        if (field == "affects_gpa") {
-          if (course[field]) {
-            cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
-          }
-        } else {
-          cell.innerHTML = course[field];
+      if (field === "affects_gpa") {
+        if (course[field]) {
+          cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
         }
-        row.appendChild(cell);
-      });
-      document.getElementById("grades-table").appendChild(row);
-      populated = true;
-    }
+      } else {
+        cell.innerHTML = course[field];
+      }
+      row.appendChild(cell);
+    });
+    document.getElementById("grades-table").appendChild(row);
+    populated = true;
   });
 
   if (populated) {
-    document.getElementById("eval-text").rows = 3;
+    document.getElementById("eval-text").rows = 6;
     calculategpa();
+    if (document.getElementById('error-toast') != null) {
+      const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
+      root.render(null);
+    }
   } else {
     const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
     root.render(<FormattingErrorToast />);
@@ -227,7 +236,7 @@ function calculategpa() {
   return true;
 }
 
-function fillSample() {
+function fill_sample() {
   document.getElementById("eval-text").value = "Grades at a Glance\n" +
     "Unofficial Grade Report - including PE courses	\n" +
     "Name	College ID	Class Year	Majors	Minors	Honors\n" +

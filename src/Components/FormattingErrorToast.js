@@ -7,8 +7,8 @@ function FormattingErrorToast() {
     const toggleShow = () => setShow(!show);
 
     return (
-        <ToastContainer className="p-3 position-fixed">
-            <Toast show={show} onClose={toggleShow} position="bottom-start">
+        <ToastContainer className="p-3" position="middle-center">
+            <Toast id="error-toast" show={show} onClose={toggleShow}>
                 <Toast.Header closeButton={true}>
                     <img
                         src={logo}

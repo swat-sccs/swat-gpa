@@ -18,6 +18,7 @@ $blue: hsl(216, 75%, 67%);
 $violet: hsl(256, 75%, 67%);
 $pink: hsl(316, 75%, 67%);
 $red: hsl(0, 75%, 67%);
+$white: hsl(56, 2%, 98%);
 
 // Default variable overrides
 $body-bg: $base-l;
@@ -26,10 +27,10 @@ $primary: $navy;
 $secondary: #ffffff;
 $success: $green;
 $info: $orange;
-$warning: #FFC107;
-$danger: #DC3545;
-$light: #F8F9FA;
-$dark: #343A40;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #343a40;
 $font-family-base: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto,
   "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
   "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -39,14 +40,14 @@ $theme-colors: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $theme-colors: map-merge(
   (
-    "primary":    $primary,
-    "secondary":  $secondary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger,
-    "light":      $light,
-    "dark":       $dark
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark,
   ),
   $theme-colors
 );
@@ -60,37 +61,37 @@ $theme-colors: map-merge(
 }
 
 strong {
-    font-weight: 800;
-    color: $orange;
+  font-weight: 800;
+  color: $orange;
 }
 
 .nav-link {
-    color:#ffffff;
+  color: $white;
 }
 
 #form-barrier {
-    padding: 0px 2rem 0px 2rem;
-    margin-bottom: 10px;
+  padding: 0px 2rem 0px 2rem;
+  margin-bottom: 10px;
 }
 
 .instructionsText {
-    font-weight: 800;
-    font-size: large;
-    margin: 0px;
-    padding: 0 12vw;
+  font-weight: 800;
+  font-size: large;
+  margin: 0px;
+  padding: 0 12vw;
 }
 
 .Button {
-    width: calc(1% + 100px);
-    padding: 10px; /* Some padding */
-    margin: 5px;
-    box-shadow: -1px 3px 4px 0px rgba(0,0,0,0.2);
-    overflow: hidden;
-    text-overflow: clip;
-    cursor: pointer; /* Pointer/hand icon */
-    float: center; /* Float the buttons side by side */
-    transition: 300ms;
-    font-size: 14px;
+  width: calc(1% + 100px);
+  padding: 10px; /* Some padding */
+  margin: 5px;
+  box-shadow: -1px 3px 4px 0px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  text-overflow: clip;
+  cursor: pointer; /* Pointer/hand icon */
+  float: center; /* Float the buttons side by side */
+  transition: 300ms;
+  font-size: 14px;
 }
 
 .App-header {
@@ -99,7 +100,7 @@ strong {
   flex-direction: column;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: $white;
 }
 
 .Table {
@@ -110,11 +111,11 @@ strong {
 }
 
 #eval-text {
-  background-color: $navy;
+  background-color: $white;
   color: $overlay-l;
   border: 0;
   box-shadow: -1px 3px 4px 0px rgba(0, 0, 0, 0.2);
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
 }
 
 .ScrollTable {

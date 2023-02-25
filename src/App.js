@@ -3,7 +3,7 @@ import './App.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client'
 
-import { Button, Form, Container, Table, Row, Col, Nav, Navbar } from 'react-bootstrap';
+import { Button, Form, Container, Table, Nav, Navbar } from 'react-bootstrap';
 
 import FormattingErrorToast from './Components/FormattingErrorToast';
 
@@ -26,7 +26,7 @@ const GRADE_POINT_EQUIVS = {
 };
 const COURSE_FIELDS = ['course',
   'title',
-  'credits_attemped',
+  'credits_attempted',
   'credits_earned',
   'grade',
   'division',
@@ -84,23 +84,26 @@ function App() {
         <p id="selected-count"></p>
       </Container>
 
-      <Table striped borderless hover className="Table" onClick={calculategpa}>
-        <thead>
-          <tr>
-            <th scope="col">Course</th>
-            <th scope="col">Title</th>
-            <th scope="col">Credits Attempted</th>
-            <th scope="col">Credits Earned</th>
-            <th scope="col">Grade</th>
-            <th scope="col">Division</th>
-            <th scope="col">Instructor</th>
-            <th scope="col">Affects GPA</th>
-          </tr>
-        </thead>
-        <tbody id="grades-table">
+      <div className="ScrollTable">
+        <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
+          <thead>
+            <tr>
+              <th scope="col" className="RightAlign">Course</th>
+              <th scope="col" className="LeftAlign">Title</th>
+              <th scope="col" className="HideColumn">CR Attempted</th>
+              <th scope="col" className="HideMoreColumn">CR Earned</th>
+              <th scope="col">Grade</th>
+              <th scope="col" className="HideColumn">Division</th>
+              <th scope="col" className="HideColumn">Instructor</th>
+              <th scope="col">Affects GPA</th>
+            </tr>
+          </thead>
+          <tbody id="grades-table">
 
-        </tbody>
-      </Table>
+          </tbody>
+        </Table>
+      </div>
+
     </div>
   );
 }
@@ -182,6 +185,18 @@ function populate_table() {
     var row = document.createElement("tr");
     COURSE_FIELDS.forEach(function (field) {
       var cell = document.createElement("td");
+      if (field === "course") {
+        cell.className = "RightAlign";
+      }
+      if (field === "title") {
+        cell.className = "LeftAlign";
+      }
+      if (field === "instructor" || field === "division" || field === "credits_attempted") {
+        cell.className = "HideColumn";
+      }
+      if (field === "credits_earned") {
+        cell.className = "HideMoreColumn";
+      }
 
       if (field === "affects_gpa") {
         if (course[field]) {

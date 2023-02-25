@@ -116,3 +116,27 @@ strong {
   box-shadow: -1px 3px 4px 0px rgba(0, 0, 0, 0.2);
   font-family: 'Roboto Mono', monospace;
 }
+
+.ScrollTable {
+  overflow-x: auto;
+}
+
+.LeftAlign {
+  text-align: left;
+}
+
+.RightAlign {
+  text-align: right;
+}
+
+@include media-breakpoint-down(lg) {
+  .HideColumn {
+    display: none;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .HideMoreColumn {
+    display: none;
+  }
+}

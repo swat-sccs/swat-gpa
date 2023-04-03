@@ -155,7 +155,10 @@ function parse_input() {
 
   var course_list = [];
 
-  courses.forEach(function (course) {
+  for (const course of courses) {
+    if (course.match(/Prior to Matriculation/)) {
+      break; // don't include AP scores
+    }
     var course_info = course.split('\t');
     course_info.shift();
     course_info.push(true); // Add 'affects_gpa' field
@@ -171,7 +174,7 @@ function parse_input() {
       }
       course_list.push(dict);
     }
-  });
+  }
 
   return course_list;
 }

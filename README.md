@@ -12,4 +12,19 @@ This is the next-generation version of the Swarthmore College Computer Society's
 
 - Dockerized Node.JS-based React app
 - Entirely client-side logic; no server-side storage of GPA etc.
-- Currently statically-served assets (html, images, manifest, robots)
+- Currently containerized statically-served assets (html, images, manifest, robots)
+
+To start dev environment:
+```bash
+docker compose -f docker-compose.debug.yml up
+```
+
+To start or update prod environment:
+```bash
+docker compose -f docker-compose.yml up --build
+```
+
+To fix ridiculous issues that may crop up with Docker's build cache:
+```build
+docker compose -f <file> build --no-cache
+```

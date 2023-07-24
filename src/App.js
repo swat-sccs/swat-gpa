@@ -239,7 +239,7 @@ function calculategpa() {
 
     let checkbox = row.cells[COURSE_FIELDS.indexOf('affects_gpa')].children[0]; // Affected GPA checkbox
     if (checkbox && checkbox.checked) {
-      let credits = parseInt(row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerHTML);
+      let credits = parseFloat(row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerHTML);
       let grade_points = grade_point_equiv(row.cells[COURSE_FIELDS.indexOf('grade')].innerHTML, row.cells[COURSE_FIELDS.indexOf('division')].innerHTML);
       total_grade_points += grade_points * credits;
       total_credits += credits;

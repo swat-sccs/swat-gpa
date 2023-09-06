@@ -60,18 +60,20 @@ function App() {
         </Container>
       </Navbar>
 
-      <div id="form-barrier" className="p-3">
-        <div id="formatting-error"></div>
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Control id="eval-text" as="textarea" rows={18}
-              placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
-          </Form.Group>
-        </Form>
-        <CustomButton value="Calculate" onClick={populate_table} />
-        <CustomButton value="Example" onClick={fill_sample} />
-        <CustomButton value="Clear" onClick={clear} />
-      </div>
+      <Container>
+        <div id="form-barrier" className="p-3">
+            <div id="formatting-error"></div>
+            <Form>
+            <Form.Group className="mb-3">
+                <Form.Control id="eval-text" as="textarea" rows={18}
+                placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
+            </Form.Group>
+            </Form>
+            <CustomButton value="Calculate" onClick={populate_table} />
+            <CustomButton value="Example" onClick={fill_sample} />
+            <CustomButton value="Clear" onClick={clear} />
+        </div>
+      </Container>
 
       <Container className="p-3">
         <p className="instructionsText">
@@ -84,25 +86,27 @@ function App() {
         <p id="selected-count"></p>
       </Container>
 
-      <div className="ScrollTable">
-        <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
-          <thead>
-            <tr>
-              <th scope="col" className="RightAlign">Course</th>
-              <th scope="col" className="LeftAlign">Title</th>
-              <th scope="col" className="HideColumn">CR Attempted</th>
-              <th scope="col" className="HideMoreColumn">CR Earned</th>
-              <th scope="col">Grade</th>
-              <th scope="col" className="HideColumn">Division</th>
-              <th scope="col" className="HideColumn">Instructor</th>
-              <th scope="col">Affects GPA</th>
-            </tr>
-          </thead>
-          <tbody id="grades-table">
+      <Container>
+        <div className="ScrollTable">
+            <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
+            <thead>
+                <tr>
+                <th scope="col" className="RightAlign">Course</th>
+                <th scope="col" className="LeftAlign">Title</th>
+                <th scope="col" className="HideColumn">CR Attempted</th>
+                <th scope="col" className="HideMoreColumn">CR Earned</th>
+                <th scope="col">Grade</th>
+                <th scope="col" className="HideColumn">Division</th>
+                <th scope="col" className="HideColumn">Instructor</th>
+                <th scope="col">Affects GPA</th>
+                </tr>
+            </thead>
+            <tbody id="grades-table">
 
-          </tbody>
-        </Table>
-      </div>
+            </tbody>
+            </Table>
+        </div>
+      </Container>
 
     </div>
   );

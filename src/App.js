@@ -62,16 +62,16 @@ function App() {
 
       <Container>
         <div id="form-barrier" className="p-3">
-            <div id="formatting-error"></div>
-            <Form>
+          <div id="formatting-error"></div>
+          <Form>
             <Form.Group className="mb-3">
-                <Form.Control id="eval-text" as="textarea" rows={18}
+              <Form.Control id="eval-text" as="textarea" rows={18}
                 placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
             </Form.Group>
-            </Form>
-            <CustomButton value="Calculate" onClick={populate_table} />
-            <CustomButton value="Example" onClick={fill_sample} />
-            <CustomButton value="Clear" onClick={clear} />
+          </Form>
+          <CustomButton value="Calculate" onClick={populate_table} />
+          <CustomButton value="Example" onClick={fill_sample} />
+          <CustomButton value="Clear" onClick={clear} />
         </div>
       </Container>
 
@@ -88,9 +88,9 @@ function App() {
 
       <Container>
         <div className="ScrollTable">
-            <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
+          <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
             <thead>
-                <tr>
+              <tr>
                 <th scope="col" className="RightAlign">Course</th>
                 <th scope="col" className="LeftAlign">Title</th>
                 <th scope="col" className="HideColumn">CR Attempted</th>
@@ -99,12 +99,12 @@ function App() {
                 <th scope="col" className="HideColumn">Division</th>
                 <th scope="col" className="HideColumn">Instructor</th>
                 <th scope="col">Affects GPA</th>
-                </tr>
+              </tr>
             </thead>
             <tbody id="grades-table">
 
             </tbody>
-            </Table>
+          </Table>
         </div>
       </Container>
 
@@ -151,17 +151,17 @@ function grade_point_equiv(grade, division) {
 function parse_input() {
   var raw_str = document.getElementById("eval-text").value;
   var lines = raw_str.split('\n');
-
   // Remove term header lines
   var courses = lines.filter(function (line) {
-    return line.trim().match(/[A-Z]{4}\s\d{3}/);
+    return line.trim().match(/[A-Z]{4}\s[A-Z0-9]{3}/);
   });
 
   var course_list = [];
+  var prior = false;
 
   for (const course of courses) {
     if (course.match(/Prior to Matriculation/)) {
-      break; // don't include AP scores
+      prior = true;
     }
     var course_info = course.split('\t');
     course_info.shift();
@@ -173,7 +173,7 @@ function parse_input() {
         return [COURSE_FIELDS[i], course_info[i]];
       }));
 
-      if (grade_point_equiv(dict['grade'], dict['division']) === 0.0) {
+      if (prior || grade_point_equiv(dict['grade'], dict['division']) === 0.0) {
         dict['affects_gpa'] = false;
       }
       course_list.push(dict);
@@ -192,25 +192,35 @@ function populate_table() {
     var row = document.createElement("tr");
     COURSE_FIELDS.forEach(function (field) {
       var cell = document.createElement("td");
-      if (field === "course") {
-        cell.className = "RightAlign";
-      }
-      if (field === "title") {
-        cell.className = "LeftAlign";
-      }
-      if (field === "instructor" || field === "division" || field === "credits_attempted") {
-        cell.className = "HideColumn";
-      }
-      if (field === "credits_earned") {
-        cell.className = "HideMoreColumn";
-      }
 
       if (field === "affects_gpa") {
         if (course[field]) {
           cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
         }
-      } else {
-        cell.innerHTML = course[field];
+        row.appendChild(cell);
+        return;
+      }
+
+      cell.innerHTML = course[field]
+      switch (field) {
+        case "affects_gpa":
+          break;
+        case "course":
+          cell.className = "RightAlign"
+          break;
+        case "title":
+          cell.className = "LeftAlign"
+          break;
+        case "instructor":
+        case "division":
+        case "credits_attempted":
+          cell.className = "HideColumn"
+          break;
+        case "credits_earned":
+          cell.className = "HideMoreColumn"
+          break;
+        default:
+          cell.innerHTML = course[field];
       }
       row.appendChild(cell);
     });
@@ -252,6 +262,9 @@ function calculategpa() {
 
     gpa = (total_grade_points / total_credits).toFixed(ROUND_TO);
     document.getElementById('selected-count').innerText = " (" + courses + " courses selected)";
+  }
+  if (isNaN(gpa)) {
+    gpa = 0.00
   }
   document.getElementById('gpa').innerHTML = "GPA: " + gpa;
 

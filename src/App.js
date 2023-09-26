@@ -188,7 +188,6 @@ function populate_table() {
   let populated = false;
 
   clearInfo(); // Let me be clear
-  console.log(course_list);
   course_list.forEach(function (course) {
     var row = document.createElement("tr");
     COURSE_FIELDS.forEach(function (field) {

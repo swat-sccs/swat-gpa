@@ -263,6 +263,9 @@ function calculategpa() {
     gpa = (total_grade_points / total_credits).toFixed(ROUND_TO);
     document.getElementById('selected-count').innerText = " (" + courses + " courses selected)";
   }
+  if (isNaN(gpa)) {
+    gpa = 0.00
+  }
   document.getElementById('gpa').innerHTML = "GPA: " + gpa;
 
   return true;

@@ -3,9 +3,10 @@ import './App.scss';
 import React from 'react';
 import ReactDOM from 'react-dom/client'
 
-import { Button, Form, Container, Table, Nav, Navbar } from 'react-bootstrap';
+import { Form, Container, Table, Nav, Navbar } from 'react-bootstrap';
 
 import FormattingErrorToast from './Components/FormattingErrorToast';
+import { CustomButton } from './Components/CustomButton';
 
 const ROUND_TO = 2;
 // Official grade point equivalencies from the Swarthmore College registrar
@@ -62,10 +63,10 @@ function App() {
 
       <Container>
         <div id="form-barrier" className="p-3">
-          <div id="formatting-error"></div>
+          <div id="formatting-error" />
           <Form>
             <Form.Group className="mb-3">
-              <Form.Control id="eval-text" as="textarea" rows={18}
+              <Form.Control id="eval-text" as="textarea" rows={15}
                 placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
             </Form.Group>
           </Form>
@@ -88,7 +89,7 @@ function App() {
 
       <Container>
         <div className="ScrollTable">
-          <Table striped borderless hover className="Table multiCol" onClick={calculategpa}>
+          <Table striped borderless hover className="Table multiCol" onClick={calculateGPA}>
             <thead>
               <tr>
                 <th scope="col" className="RightAlign">Course</th>
@@ -102,7 +103,6 @@ function App() {
               </tr>
             </thead>
             <tbody id="grades-table">
-
             </tbody>
           </Table>
         </div>
@@ -112,15 +112,9 @@ function App() {
   );
 }
 
-function CustomButton(props) {
-  return (
-    <Button className="Button" size="lg" variant="primary" as="input" type="submit" onClick={props.onClick} value={props.value} />
-  );
-}
-
 function clearText() {
   document.getElementById("eval-text").value = "";
-  document.getElementById("eval-text").rows = 18;
+  document.getElementById("eval-text").rows = 15;
 }
 
 function clearInfo() {
@@ -169,7 +163,6 @@ function parse_input() {
 
     if (course_info.length === COURSE_FIELDS.length) {
       var dict = Object.fromEntries(course_info.map(function (field, i) {
-
         return [COURSE_FIELDS[i], course_info[i]];
       }));
 
@@ -230,7 +223,7 @@ function populate_table() {
 
   if (populated) {
     document.getElementById("eval-text").rows = 6;
-    calculategpa();
+    calculateGPA();
     if (document.getElementById('error-toast') != null) {
       const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
       root.render(null);
@@ -242,7 +235,7 @@ function populate_table() {
 }
 
 
-function calculategpa() {
+function calculateGPA() {
   let total_grade_points = 0;
   let total_credits = 0;
   let courses = 0;

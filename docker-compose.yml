@@ -3,11 +3,28 @@ version: '3.4'
 services:
   sccsgpacalc:
     restart: unless-stopped
+    image: gpacalc
     build:
       context: .
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
-    ports:
-      - 56475:3000
-    command: serve -s build
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.network=traefik'
+        - 'traefik.http.routers.gpacalc.entrypoints=https'
+        - 'traefik.http.routers.gpacalc.rule=Host(`gpacalc.sccs.swarthmore.edu`)'
+        - 'traefik.http.routers.gpacalc.tls=true'
+        - 'traefik.http.routers.gpacalc.tls.certresolver=letsEncrypt'
+        - 'traefik.http.services.gpacalc.loadbalancer.server.port=3000'
+    command: serve -l tcp://0.0.0.0:3000 -s build
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true

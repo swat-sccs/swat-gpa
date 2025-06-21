@@ -142,3 +142,53 @@ strong {
     display: none;
   }
 }
+
+.hidden {
+  display: none;
+}
+department-dropdown {
+  .dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  input[type='checkbox'] {
+    margin-right: 0.5rem;
+  }
+}
+
+#dept-toggle-container,
+#dept-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+#dept-toggle-container .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+}
+
+#dept-toggle-container .form-check-label {
+  margin: 0;
+  line-height: 1.2;
+}
+
+#dept-toggle-container .form-check-input {
+  margin: 0;
+  width: 0.9em;
+  height: 0.9em;
+  transform: translateY(-1px);
+  accent-color: $orange;
+  border: 2px solid darken($orange, 20%);
+}

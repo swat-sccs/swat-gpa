@@ -1,12 +1,15 @@
 import logo from './logo.svg';
 import './App.scss';
 import React from 'react';
-import ReactDOM from 'react-dom/client'
+import ReactDOM from 'react-dom/client';
 
 import { Form, Container, Table, Nav, Navbar } from 'react-bootstrap';
 
 import FormattingErrorToast from './Components/FormattingErrorToast';
 import { CustomButton } from './Components/CustomButton';
+import { DepartmentDropdown } from './Components/DepartmentDropdown';
+
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 const ROUND_TO = 2;
 // Official grade point equivalencies from the Swarthmore College registrar
@@ -25,19 +28,23 @@ const GRADE_POINT_EQUIVS = {
   'D-': 0.67,
   'F': 0.0
 };
-const COURSE_FIELDS = ['course',
+const COURSE_FIELDS = [
+  'course',
   'title',
   'credits_attempted',
   'credits_earned',
   'grade',
   'division',
   'instructor',
-  'affects_gpa'];
+  'affects_gpa'
+];
+
+let useDeptMode = false;
 
 function App() {
   return (
     <div className="App">
-      <Navbar bg="primary" variant="dark" >
+      <Navbar bg="primary" variant="dark">
         <Container>
           <Navbar.Brand href="https://sccs.swarthmore.edu">
             <img
@@ -50,12 +57,18 @@ function App() {
           </Navbar.Brand>
           <Nav>
             <Nav.Item>
-              <Nav.Link href="/"><h4>Swarthmore College <br /> <strong>GPA Calculator</strong></h4></Nav.Link>
+              <Nav.Link href="/">
+                <h4>
+                  Swarthmore College <br /> <strong>GPA Calculator</strong>
+                </h4>
+              </Nav.Link>
             </Nav.Item>
           </Nav>
           <Nav activeKey="/">
             <Nav.Item>
-              <Nav.Link href="https://sccs.swarthmore.edu/docs"><h4>Docs</h4></Nav.Link>
+              <Nav.Link href="https://sccs.swarthmore.edu/docs">
+                <h4>Docs</h4>
+              </Nav.Link>
             </Nav.Item>
           </Nav>
         </Container>
@@ -64,21 +77,55 @@ function App() {
       <Container>
         <div id="form-barrier" className="p-3">
           <div id="formatting-error" />
+
           <Form>
             <Form.Group className="mb-3">
-              <Form.Control id="eval-text" as="textarea" rows={15}
-                placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box." />
+              <Form.Control
+                id="eval-text"
+                as="textarea"
+                rows={15}
+                placeholder="Instructions: Go to mySwat, copy the entirety of the Grades at a Glance page (CTRL + A), then paste it into this text box."
+              />
             </Form.Group>
           </Form>
+
           <CustomButton value="Calculate" onClick={populate_table} />
           <CustomButton value="Example" onClick={fill_sample} />
           <CustomButton value="Clear" onClick={clear} />
+
+          <div id="dept-toggle-container" style={{ display: 'none' }}>
+            <Form.Check
+              type="checkbox"
+              id="deptToggle"
+              label="Select Departments"
+              className="mb-3"
+              onChange={e => {
+                useDeptMode = e.target.checked;
+                populate_table();
+              }}
+            />
+          </div>
+
+          <div
+            id="dept-filter"
+            className="mb-3 w-100 d-flex justify-content-center"
+          />
         </div>
       </Container>
 
       <Container className="p-3">
         <p className="instructionsText">
-          Instructions: Go to <a href="https://myswat.swarthmore.edu/" target="_blank" rel="noreferrer">mySwat</a>, copy the entirety of the "Grades at a Glance" page (CTRL + A), then paste it into the text box above. Finally, click "Calculate GPA" to see your GPA.
+          Instructions: Go to{' '}
+          <a
+            href="https://myswat.swarthmore.edu/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            mySwat
+          </a>
+          , copy the entirety of the "Grades at a Glance" page (CTRL + A), then
+          paste it into the text box above. Finally, click "Calculate GPA" to
+          see your GPA.
         </p>
       </Container>
 
@@ -89,11 +136,21 @@ function App() {
 
       <Container>
         <div className="ScrollTable">
-          <Table striped borderless hover className="Table multiCol" onClick={calculateGPA}>
+          <Table
+            striped
+            borderless
+            hover
+            className="Table multiCol"
+            onClick={calculateGPA}
+          >
             <thead>
               <tr>
-                <th scope="col" className="RightAlign">Course</th>
-                <th scope="col" className="LeftAlign">Title</th>
+                <th scope="col" className="RightAlign">
+                  Course
+                </th>
+                <th scope="col" className="LeftAlign">
+                  Title
+                </th>
                 <th scope="col" className="HideColumn">CR Attempted</th>
                 <th scope="col" className="HideMoreColumn">CR Earned</th>
                 <th scope="col">Grade</th>
@@ -102,30 +159,36 @@ function App() {
                 <th scope="col">Affects GPA</th>
               </tr>
             </thead>
-            <tbody id="grades-table">
-            </tbody>
+            <tbody id="grades-table"></tbody>
           </Table>
         </div>
       </Container>
-
     </div>
   );
 }
 
 function clearText() {
-  document.getElementById("eval-text").value = "";
-  document.getElementById("eval-text").rows = 15;
+  const txt = document.getElementById('eval-text');
+  txt.value = '';
+  txt.rows = 15;
 }
 
 function clearInfo() {
-  document.getElementById("grades-table").innerHTML = "";
-  document.getElementById("gpa").innerHTML = "";
-  document.getElementById("selected-count").innerHTML = "";
+  document.getElementById('grades-table').innerHTML = '';
+  document.getElementById('gpa').innerHTML = '';
+  document.getElementById('selected-count').innerHTML = '';
+  const deptFilterDiv = document.getElementById('dept-filter');
+  if (deptFilterDiv) deptFilterDiv.innerHTML = '';
 }
 
 function clear() {
   clearText();
   clearInfo();
+  useDeptMode = false;
+  const toggleContainer = document.getElementById('dept-toggle-container');
+  if (toggleContainer) toggleContainer.style.display = 'none';
+  const toggleCheckbox = document.getElementById('deptToggle');
+  if (toggleCheckbox) toggleCheckbox.checked = false;
 }
 
 function grade_point_equiv(grade, division) {
@@ -137,37 +200,34 @@ function grade_point_equiv(grade, division) {
   } else {
     // Grade is already formatted as a grade point float (for Bryn Mawr and Haverford classes)
     // Or it's has no grade (for C/NC classes)
-    var grade_point = parseFloat(grade);
-    return isNaN(grade_point) ? 0.0 : grade_point;
+    const gp = parseFloat(grade);
+    return isNaN(gp) ? 0.0 : gp;
   }
 }
 
 function parse_input() {
-  var raw_str = document.getElementById("eval-text").value;
-  var lines = raw_str.split('\n');
+  const raw_str = document.getElementById('eval-text').value;
+  const lines = raw_str.split('\n');
   // Remove term header lines
-  var courses = lines.filter(function (line) {
-    return line.trim().match(/[A-Z]{4}\s[A-Z0-9]{3}/);
-  });
+  const courses = lines.filter(line => line.trim().match(/[A-Z]{4}\s[A-Z0-9]{3}/));
 
-  var course_list = [];
-  var prior = false;
+  const course_list = [];
+  let prior = false;
 
   for (const course of courses) {
     if (course.match(/Prior to Matriculation/)) {
       prior = true;
     }
-    var course_info = course.split('\t');
-    course_info.shift();
-    course_info.push(true); // Add 'affects_gpa' field
+    const parts = course.split('\t');
+    parts.shift();
+    parts.push(true); // Add 'affects_gpa' field
 
-    if (course_info.length === COURSE_FIELDS.length) {
-      var dict = Object.fromEntries(course_info.map(function (field, i) {
-        return [COURSE_FIELDS[i], course_info[i]];
-      }));
-
-      if (prior || grade_point_equiv(dict['grade'], dict['division']) === 0.0) {
-        dict['affects_gpa'] = false;
+    if (parts.length === COURSE_FIELDS.length) {
+      const dict = Object.fromEntries(
+        parts.map((field, i) => [COURSE_FIELDS[i], parts[i]])
+      );
+      if (prior || grade_point_equiv(dict.grade, dict.division) === 0.0) {
+        dict.affects_gpa = false;
       }
       course_list.push(dict);
     }
@@ -177,117 +237,121 @@ function parse_input() {
 }
 
 function populate_table() {
-  let course_list = parse_input();
+  const course_list = parse_input();
   let populated = false;
 
   clearInfo(); // Let me be clear
-  course_list.forEach(function (course) {
-    var row = document.createElement("tr");
-    COURSE_FIELDS.forEach(function (field) {
-      var cell = document.createElement("td");
 
-      if (field === "affects_gpa") {
+  const toggleContainer = document.getElementById('dept-toggle-container');
+  if (toggleContainer) toggleContainer.style.display = 'block';
+
+  const deptFilterDiv = document.getElementById('dept-filter');
+  deptFilterDiv.innerHTML = '';
+  if (useDeptMode) {
+    const depts = Array.from(new Set(course_list.map(c => c.course.split(' ')[0])));
+    if (depts.length > 0) {
+      const deptRoot = ReactDOM.createRoot(deptFilterDiv);
+      deptRoot.render(<DepartmentDropdown departments={depts} onChange={calculateGPA} />);
+    }
+  }
+
+  course_list.forEach(course => {
+    const row = document.createElement('tr');
+    COURSE_FIELDS.forEach(field => {
+      const cell = document.createElement('td');
+      if (field === 'affects_gpa') {
         if (course[field]) {
-          cell.innerHTML = "<input type=\"checkbox\" id=\"" + course["course"] + "\" checked></input>";
+          cell.innerHTML = `<input type="checkbox" checked />`;
         }
         row.appendChild(cell);
         return;
       }
-
-      cell.innerHTML = course[field]
-      switch (field) {
-        case "affects_gpa":
-          break;
-        case "course":
-          cell.className = "RightAlign"
-          break;
-        case "title":
-          cell.className = "LeftAlign"
-          break;
-        case "instructor":
-        case "division":
-        case "credits_attempted":
-          cell.className = "HideColumn"
-          break;
-        case "credits_earned":
-          cell.className = "HideMoreColumn"
-          break;
-        default:
-          cell.innerHTML = course[field];
-      }
+      cell.innerText = course[field];
+      if (field === 'course') cell.className = 'RightAlign';
+      if (field === 'title') cell.className = 'LeftAlign';
+      if (['instructor', 'division', 'credits_attempted'].includes(field)) cell.className = 'HideColumn';
+      if (field === 'credits_earned') cell.className = 'HideMoreColumn';
       row.appendChild(cell);
     });
-    document.getElementById("grades-table").appendChild(row);
+    document.getElementById('grades-table').appendChild(row);
     populated = true;
   });
 
   if (populated) {
-    document.getElementById("eval-text").rows = 6;
+    document.getElementById('eval-text').rows = 6;
     calculateGPA();
-    if (document.getElementById('error-toast') != null) {
-      const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
-      root.render(null);
-    }
+    const errRoot = ReactDOM.createRoot(document.getElementById('formatting-error'));
+    errRoot.render(null);
   } else {
-    const root = ReactDOM.createRoot(document.getElementById("formatting-error"));
-    root.render(<FormattingErrorToast />);
+    const errRoot = ReactDOM.createRoot(document.getElementById('formatting-error'));
+    errRoot.render(<FormattingErrorToast />);
   }
 }
 
-
 function calculateGPA() {
+  const selectedDepts = Array.from(
+    document.querySelectorAll('.dept-checkbox:checked')
+  ).map(cb => cb.value);
+
   let total_grade_points = 0;
   let total_credits = 0;
   let courses = 0;
   let gpa = null;
 
-  for (let i = 0; i < document.getElementById('grades-table').rows.length; i++) {
-    let row = document.getElementById('grades-table').rows[i];
+  const rows = document.getElementById('grades-table').rows;
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const courseCode = row.cells[COURSE_FIELDS.indexOf('course')].innerText;
+    const dept = courseCode.split(' ')[0];
+    if (useDeptMode && !selectedDepts.includes(dept)) continue;
 
-    let checkbox = row.cells[COURSE_FIELDS.indexOf('affects_gpa')].children[0]; // Affected GPA checkbox
+    const checkbox = row.cells[COURSE_FIELDS.indexOf('affects_gpa')].children[0]; // Affected GPA checkbox
     if (checkbox && checkbox.checked) {
-      let credits = parseFloat(row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerHTML);
-      let grade_points = grade_point_equiv(row.cells[COURSE_FIELDS.indexOf('grade')].innerHTML, row.cells[COURSE_FIELDS.indexOf('division')].innerHTML);
+      const credits = parseFloat(
+        row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerText
+      );
+      const grade_points = grade_point_equiv(
+        row.cells[COURSE_FIELDS.indexOf('grade')].innerText,
+        row.cells[COURSE_FIELDS.indexOf('division')].innerText
+      );
       total_grade_points += grade_points * credits;
       total_credits += credits;
       courses++;
     }
-
     gpa = (total_grade_points / total_credits).toFixed(ROUND_TO);
-    document.getElementById('selected-count').innerText = " (" + courses + " courses selected)";
+    document.getElementById('selected-count').innerText = ` (${courses} courses selected)`;
   }
-  if (isNaN(gpa)) {
-    gpa = 0.00
-  }
-  document.getElementById('gpa').innerHTML = "GPA: " + gpa;
+  if (isNaN(gpa)) gpa = '0.00';
+  document.getElementById('gpa').innerText = `GPA: ${gpa}`;
 
   return true;
 }
 
 function fill_sample() {
-  document.getElementById("eval-text").value = "Grades at a Glance\n" +
-    "Unofficial Grade Report - including PE courses	\n" +
-    "Name	College ID	Class Year	Majors	Minors	Honors\n" +
-    "John A. Doe	123456789	2025	Computer Science	 	 \n" +
-    "Term	Course	Course Title	Credits Attempted	Credits Earned	Grade	Distribution	Instructor\n" +
-    "202202 Spring 2022	LING 050 01W	Syntax (W)	1	1	A-	SS, W	Irwin, Patricia\n" +
-    " 	CPSC 075 01	Compilers	1	1	D	NS, NSEP	Palmer, Zachary\n" +
-    " 	THEA 004E 01	Sound Design	1	1	B	HU	Atkinson, Elizabeth\n" +
-    " 	ENGL 028 01	Milton	1	1	A	HU	Song, Eric\n" +
-    "Credits Earned	 	 	 	4	 	 	 \n" +
-    "202104 Fall 2021	ENGL 035 01	Rise of the Novel(W)	1	1	A-	HU, W	Buurma, Rachel\n" +
-    " 	ENGR 015 01	Fund Digital&Embedded System	1	1	A-	NS, NSEP	Phillips, Stephen\n" +
-    " 	PHED 071CS 01	CS: Fencing	0	0	1	PE	 \n" +
-    " 	CPSC 073 01	Programming Languages	1	1	A	NS, NSEP	Palmer, Zachary\n" +
-    " 	MATH 027 02	Linear Algebra	1	1	C	NS	Lorman, Vitaly\n" +
-    "Credits Earned	 	 	 	4	 	 	 \n" +
-    "202102 Spring 2021	PSYC 001 01	R:Introduction to Psychology	1	1	A	SS	Blanchar, John\n" +
-    " 	CPSC 031 01	R:Intro to Computer Systems	1	1	A	NS, NSEP	Newhall, Tia\n" +
-    " 	ENGL 046 01	R:Tolkien & Pullman: Lit Roots	1	1	A-	HU	Williamson, Craig\n" +
-    " 	MATH 029 01	R:Discrete Mathematics	1	1	B	NS	Crawford, Thomas\n" +
-    " 	PHED 071CS 01	CS: Fencing	0	0	1	PE	 \n" +
-    "Credits Earned	 	 	 	4	 	 	 \n" +
-    "Total Credits Earned	 	 	 	12	 	 	 \n" +
+  document.getElementById('eval-text').value =
+    "Grades at a Glance\n" +
+    "Unofficial Grade Report - including PE courses\t\n" +
+    "Name\tCollege ID\tClass Year\tMajors\tMinors\tHonors\n" +
+    "John A. Doe\t123456789\t2025\tComputer Science\t \t \n" +
+    "Term\tCourse\tCourse Title\tCredits Attempted\tCredits Earned\tGrade\tDistribution\tInstructor\n" +
+    "202202 Spring 2022\tLING 050 01W\tSyntax (W)\t1\t1\tA-\tSS, W\tIrwin, Patricia\n" +
+    " \tCPSC 075 01\tCompilers\t1\t1\tD\tNS, NSEP\tPalmer, Zachary\n" +
+    " \tTHEA 004E 01\tSound Design\t1\t1\tB\tHU\tAtkinson, Elizabeth\n" +
+    " \tENGL 028 01\tMilton\t1\t1\tA\tHU\tSong, Eric\n" +
+    "Credits Earned\t \t \t \t4\t \t \t \n" +
+    "202104 Fall 2021\tENGL 035 01\tRise of the Novel(W)\t1\t1\tA-\tHU, W\tBuurma, Rachel\n" +
+    " \tENGR 015 01\tFund Digital&Embedded System\t1\t1\tA-\tNS, NSEP\tPhillips, Stephen\n" +
+    " \tPHED 071CS 01\tCS: Fencing\t0\t0\t1\tPE\t \n" +
+    " \tCPSC 073 01\tProgramming Languages\t1\t1\tA\tNS, NSEP\tPalmer, Zachary\n" +
+    " \tMATH 027 02\tLinear Algebra\t1\t1\tC\tNS\tLorman, Vitaly\n" +
+    "Credits Earned\t \t \t \t4\t \t \t \n" +
+    "202102 Spring 2021\tPSYC 001 01\tR:Introduction to Psychology\t1\t1\tA\tSS\tBlanchar, John\n" +
+    " \tCPSC 031 01\tR:Intro to Computer Systems\t1\t1\tA\tNS, NSEP\tNewhall, Tia\n" +
+    " \tENGL 046 01\tR:Tolkien & Pullman: Lit Roots\t1\t1\tA-\tHU\tWilliamson, Craig\n" +
+    " \tMATH 029 01\tR:Discrete Mathematics\t1\t1\tB\tNS\tCrawford, Thomas\n" +
+    " \tPHED 071CS 01\tCS: Fencing\t0\t0\t1\tPE\t \n" +
+    "Credits Earned\t \t \t \t4\t \t \t \n" +
+    "Total Credits Earned\t \t \t \t12\t \t \t \n" +
     "release 1.0 Set Screen Reader Mode On\n";
 
   populate_table();

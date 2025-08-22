@@ -93,7 +93,7 @@ function App() {
           <CustomButton value="Example" onClick={fill_sample} />
           <CustomButton value="Clear" onClick={clear} />
 
-          <div id="dept-toggle-container" style={{ display: 'none' }}>
+          <div id="dept-toggle-container" className="hidden">
             <Form.Check
               type="checkbox"
               id="deptToggle"
@@ -130,8 +130,9 @@ function App() {
       </Container>
 
       <Container className="p-3">
-        <h1 id="gpa"></h1>
+        <h1 id="gpa" aria-live="polite"></h1>
         <p id="selected-count"></p>
+        <div id="selected-departments" className="d-flex flex-wrap gap-2 my-2" aria-live="polite"></div>
       </Container>
 
       <Container>
@@ -179,6 +180,8 @@ function clearInfo() {
   document.getElementById('selected-count').innerHTML = '';
   const deptFilterDiv = document.getElementById('dept-filter');
   if (deptFilterDiv) deptFilterDiv.innerHTML = '';
+  const chips = document.getElementById('selected-departments');
+  if (chips) chips.innerHTML = '';
 }
 
 function clear() {
@@ -186,7 +189,7 @@ function clear() {
   clearInfo();
   useDeptMode = false;
   const toggleContainer = document.getElementById('dept-toggle-container');
-  if (toggleContainer) toggleContainer.style.display = 'none';
+  if (toggleContainer) toggleContainer.classList.add('hidden');
   const toggleCheckbox = document.getElementById('deptToggle');
   if (toggleCheckbox) toggleCheckbox.checked = false;
 }
@@ -243,7 +246,7 @@ function populate_table() {
   clearInfo(); // Let me be clear
 
   const toggleContainer = document.getElementById('dept-toggle-container');
-  if (toggleContainer) toggleContainer.style.display = 'block';
+  if (toggleContainer) toggleContainer.classList.remove('hidden');
 
   const deptFilterDiv = document.getElementById('dept-filter');
   deptFilterDiv.innerHTML = '';
@@ -269,7 +272,7 @@ function populate_table() {
       cell.innerText = course[field];
       if (field === 'course') cell.className = 'RightAlign';
       if (field === 'title') cell.className = 'LeftAlign';
-      if (['instructor', 'division', 'credits_attempted'].includes(field)) cell.className = 'HideColumn';
+      if (["instructor", "division", "credits_attempted"].includes(field)) cell.className = 'HideColumn';
       if (field === 'credits_earned') cell.className = 'HideMoreColumn';
       row.appendChild(cell);
     });
@@ -288,40 +291,89 @@ function populate_table() {
   }
 }
 
+function getSelectedDepts() {
+  return Array.from(document.querySelectorAll('.dept-checkbox:checked')).map(cb => cb.value);
+}
+
+function renderSelectedDeptChips(selectedDepts) {
+  const chips = document.getElementById('selected-departments');
+  if (!chips) return;
+
+  if (!useDeptMode || selectedDepts.length === 0) {
+    chips.innerHTML = '';
+    return;
+  }
+
+  chips.innerHTML = selectedDepts
+    .sort()
+    .map(d => `<span class=\"badge rounded-pill bg-info\">${d}</span>`)
+    .join('');
+}
+
 function calculateGPA() {
-  const selectedDepts = Array.from(
-    document.querySelectorAll('.dept-checkbox:checked')
-  ).map(cb => cb.value);
+  const selectedDepts = getSelectedDepts();
+  renderSelectedDeptChips(selectedDepts);
+
+  const affectsIdx = COURSE_FIELDS.indexOf('affects_gpa');
+  const courseIdx = COURSE_FIELDS.indexOf('course');
+  const creditsEarnedIdx = COURSE_FIELDS.indexOf('credits_earned');
+  const gradeIdx = COURSE_FIELDS.indexOf('grade');
+  const divisionIdx = COURSE_FIELDS.indexOf('division');
 
   let total_grade_points = 0;
   let total_credits = 0;
   let courses = 0;
-  let gpa = null;
 
   const rows = document.getElementById('grades-table').rows;
+
+  const filterActive = useDeptMode && selectedDepts.length > 0;
+
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    const courseCode = row.cells[COURSE_FIELDS.indexOf('course')].innerText;
+    const courseCode = row.cells[courseIdx].innerText;
     const dept = courseCode.split(' ')[0];
-    if (useDeptMode && !selectedDepts.includes(dept)) continue;
 
-    const checkbox = row.cells[COURSE_FIELDS.indexOf('affects_gpa')].children[0]; // Affected GPA checkbox
+    const included = !filterActive || selectedDepts.includes(dept);
+
+    const checkbox = row.cells[affectsIdx]?.children?.[0];
+
+    if (checkbox) {
+      if (!included) {
+        if (row.dataset.prevChecked === undefined) {
+          row.dataset.prevChecked = checkbox.checked ? 'true' : 'false';
+        }
+        checkbox.checked = false;
+        checkbox.disabled = true;
+        checkbox.title = 'Excluded by department filter';
+      } else {
+        checkbox.disabled = false;
+        checkbox.title = '';
+        if (row.dataset.prevChecked !== undefined) {
+          checkbox.checked = row.dataset.prevChecked === 'true';
+        }
+        row.dataset.prevChecked = checkbox.checked ? 'true' : 'false';
+      }
+    }
+
+    if (!included) continue;
+
     if (checkbox && checkbox.checked) {
-      const credits = parseFloat(
-        row.cells[COURSE_FIELDS.indexOf('credits_earned')].innerText
-      );
+      const credits = parseFloat(row.cells[creditsEarnedIdx].innerText);
       const grade_points = grade_point_equiv(
-        row.cells[COURSE_FIELDS.indexOf('grade')].innerText,
-        row.cells[COURSE_FIELDS.indexOf('division')].innerText
+        row.cells[gradeIdx].innerText,
+        row.cells[divisionIdx].innerText
       );
       total_grade_points += grade_points * credits;
       total_credits += credits;
       courses++;
     }
-    gpa = (total_grade_points / total_credits).toFixed(ROUND_TO);
-    document.getElementById('selected-count').innerText = ` (${courses} courses selected)`;
   }
-  if (isNaN(gpa)) gpa = '0.00';
+
+  const gpa = total_credits > 0
+    ? (total_grade_points / total_credits).toFixed(ROUND_TO)
+    : '0.00';
+
+  document.getElementById('selected-count').innerText = courses ? ` (${courses} courses selected)` : '';
   document.getElementById('gpa').innerText = `GPA: ${gpa}`;
 
   return true;

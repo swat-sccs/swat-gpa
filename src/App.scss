@@ -146,7 +146,9 @@ strong {
 .hidden {
   display: none;
 }
-department-dropdown {
+
+department-dropdown,
+.department-dropdown {
   .dropdown-menu {
     max-height: 200px;
     overflow-y: auto;
@@ -166,7 +168,7 @@ department-dropdown {
 #dept-toggle-container,
 #dept-filter {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   margin-top: 1rem;
@@ -191,4 +193,46 @@ department-dropdown {
   transform: translateY(-1px);
   accent-color: $orange;
   border: 2px solid darken($orange, 20%);
+}
+
+#selected-departments {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: .5rem;
+}
+
+#selected-departments:empty {
+  display: none;
+}
+
+#selected-departments .badge {
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  font-weight: 600;
+}
+
+#selected-departments .badge.bg-info {
+  background-color: $info !important;
+  color: color-contrast($info);
+}
+
+.Table tbody tr {
+  transition: opacity .2s ease, filter .2s ease;
+}
+
+.Table tbody tr.RowFilteredOut {
+  opacity: .45;
+  filter: grayscale(.2);
+}
+
+.Table tbody tr:has(td input[type='checkbox'][disabled]) {
+  opacity: .45;
+  filter: grayscale(.2);
+}
+
+input[type='checkbox'][disabled] {
+  cursor: not-allowed;
+  opacity: .65;
 }

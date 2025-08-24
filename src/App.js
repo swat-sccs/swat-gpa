@@ -93,7 +93,7 @@ function App() {
           <CustomButton value="Example" onClick={fill_sample} />
           <CustomButton value="Clear" onClick={clear} />
 
-          <div id="dept-toggle-container" className="hidden">
+          <div id="dept-toggle-container" className="d-none">
             <Form.Check
               type="checkbox"
               id="deptToggle"
@@ -189,7 +189,7 @@ function clear() {
   clearInfo();
   useDeptMode = false;
   const toggleContainer = document.getElementById('dept-toggle-container');
-  if (toggleContainer) toggleContainer.classList.add('hidden');
+  if (toggleContainer) toggleContainer.classList.add('d-none');
   const toggleCheckbox = document.getElementById('deptToggle');
   if (toggleCheckbox) toggleCheckbox.checked = false;
 }
@@ -246,17 +246,10 @@ function populate_table() {
   clearInfo(); // Let me be clear
 
   const toggleContainer = document.getElementById('dept-toggle-container');
-  if (toggleContainer) toggleContainer.classList.remove('hidden');
+  if (toggleContainer) toggleContainer.classList.add('d-none');
 
   const deptFilterDiv = document.getElementById('dept-filter');
   deptFilterDiv.innerHTML = '';
-  if (useDeptMode) {
-    const depts = Array.from(new Set(course_list.map(c => c.course.split(' ')[0])));
-    if (depts.length > 0) {
-      const deptRoot = ReactDOM.createRoot(deptFilterDiv);
-      deptRoot.render(<DepartmentDropdown departments={depts} onChange={calculateGPA} />);
-    }
-  }
 
   course_list.forEach(course => {
     const row = document.createElement('tr');
@@ -285,6 +278,16 @@ function populate_table() {
     calculateGPA();
     const errRoot = ReactDOM.createRoot(document.getElementById('formatting-error'));
     errRoot.render(null);
+
+    if (toggleContainer) toggleContainer.classList.remove('d-none');
+
+    if (useDeptMode) {
+      const depts = Array.from(new Set(course_list.map(c => c.course.split(' ')[0])));
+      if (depts.length > 0) {
+        const deptRoot = ReactDOM.createRoot(deptFilterDiv);
+        deptRoot.render(<DepartmentDropdown departments={depts} onChange={calculateGPA} />);
+      }
+    }
   } else {
     const errRoot = ReactDOM.createRoot(document.getElementById('formatting-error'));
     errRoot.render(<FormattingErrorToast />);

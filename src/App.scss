@@ -168,31 +168,31 @@ department-dropdown,
 #dept-toggle-container,
 #dept-filter {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 1rem;
+}
+
+#dept-toggle-container {
+  margin-top: 1.5rem;
 }
 
 #dept-toggle-container .form-check {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.95rem;
+  padding-left: 0;
+  margin: 0;
+}
+
+#dept-toggle-container .form-check-input {
+  float: none;
+  margin: 0;
 }
 
 #dept-toggle-container .form-check-label {
   margin: 0;
   line-height: 1.2;
-}
-
-#dept-toggle-container .form-check-input {
-  margin: 0;
-  width: 0.9em;
-  height: 0.9em;
-  transform: translateY(-1px);
-  accent-color: $orange;
-  border: 2px solid darken($orange, 20%);
 }
 
 #selected-departments {

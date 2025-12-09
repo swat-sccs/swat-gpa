@@ -9,6 +9,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: production
+      NODE_OPTIONS: "--no-warnings"
     deploy:
       placement:
         constraints:

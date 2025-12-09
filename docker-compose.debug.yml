@@ -9,6 +9,7 @@ services:
       - ./:/usr/src/app
     environment:
       NODE_ENV: development
+      NODE_OPTIONS: "--no-warnings"
     ports:
       - 3000:3000
       - 9229:9229
